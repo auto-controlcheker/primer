@@ -9,15 +9,27 @@
 <body>
     <div class="container">
         <h2>СКУД Карамель</h2>
-        <select id="nameSelect">
-            <option value="Вячеслав">Вячеслав</option>
-            <option value="Алёна">Алёна</option>
-            <option value="Сотрудник 3">Сотрудник 3</option>
+        
+        <select id="nameSelect" class="employee-select">
+            <option value="Вячеслав Валерьевич">Вячеслав Валерьевич</option>
+            <option value="Алена Дмитриевна">Алена Дмитриевна</option>
+            <option value="Галина Александровна">Галина Александровна</option>
+            <option value="Мадина Жансериковна">Мадина Жансериковна</option>
+            <option value="Марина">Марина</option>
+            <option value="Сандугаш">Сандугаш</option>
+            <option value="Зайра">Зайра</option>
+            <option value="Виктория">Виктория</option>
+            <option value="Наталья">Наталья</option>
+            <option value="Самал">Самал</option>
+            <option value="Кенжегуль">Кенжегуль</option>
+            <option value="Гульжан">Гульжан</option>
         </select>
+
         <div class="buttons">
             <button class="btn btn-in" onclick="sendData('Пришел')">Пришел</button>
             <button class="btn btn-out" onclick="sendData('Ушел')">Ушел</button>
         </div>
+        
         <p id="status"></p>
     </div>
     <script src="script.js"></script>
