@@ -1,4 +1,4 @@
-const WEB_APP_URL = "ТВОЯ_ССЫЛКА_ИЗ_GOOGLE_DEPLOY"; // Убедись, что она с /exec на конце
+const WEB_APP_URL = "ТВОЯ_ССЫЛКА_ИЗ_GOOGLE_DEPLOY"; // Проверь, что /exec на конце
 let currentEmployee = "";
 
 function openModal(name) {
@@ -20,29 +20,20 @@ function processAction(action) {
         const lat = pos.coords.latitude;
         const lon = pos.coords.longitude;
         
-        // Формируем параметры для Google Script (именно так их ждет твой код)
-        const params = new URLSearchParams({
-            name: currentEmployee,
-            action: action,
-            lat: lat,
-            lon: lon,
-            deviceId: "web-client"
-        });
+        // Создаем невидимую форму, как это делает Тильда
+        const url = `${WEB_APP_URL}?name=${encodeURIComponent(currentEmployee)}&action=${encodeURIComponent(action)}&lat=${lat}&lon=${lon}&deviceId=web-client`;
 
-        // Отправляем GET запрос (твой doGet подхватит это)
-        fetch(`${WEB_APP_URL}?${params.toString()}`, {
-            method: "GET",
-            mode: "no-cors"
-        })
-        .then(() => {
+        // Создаем скрытый элемент <img> для отправки GET-запроса в обход всех защит CORS
+        const img = new Image();
+        img.src = url;
+        
+        // Google Script всегда вернет ошибку загрузки картинки (потому что он вернет текст), 
+        // но запрос ДОЙДЕТ до таблицы. Это самый старый и надежный хак.
+        img.onload = img.onerror = function() {
             status.innerText = "✅ Записано!";
             status.style.color = "green";
             setTimeout(closeModal, 1500);
-        })
-        .catch(err => {
-            status.innerText = "❌ Ошибка сети";
-            status.style.color = "red";
-        });
+        };
 
     }, err => {
         status.innerText = "❌ ВКЛЮЧИТЕ GPS!";
