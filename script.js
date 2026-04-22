@@ -1,4 +1,4 @@
-const WEB_APP_URL = "ТВОЯ_ССЫЛКА_ИЗ_GOOGLE_DEPLOY"; // Проверь, что /exec на конце
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby8YA-AdJj3cEq2so05pur4ZsiFziEE_owOo3HYfztju4nAyKjtz5AQKEVqoMjaMxfIRw/exec"; // Проверь, что /exec на конце
 let currentEmployee = "";
 
 function openModal(name) {
