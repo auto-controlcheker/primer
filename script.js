@@ -1,4 +1,4 @@
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby8YA-AdJj3cEq2so05pur4ZsiFziEE_owOo3HYfztju4nAyKjtz5AQKEVqoMjaMxfIRw/exec";
+const WEB_APP_URL = "ТВОЯ_ССЫЛКА_ИЗ_GOOGLE_DEPLOY"; // Убедись, что она с /exec на конце
 let currentEmployee = "";
 
 function openModal(name) {
@@ -17,27 +17,33 @@ function processAction(action) {
     status.innerText = "⏳ Запись...";
     
     navigator.geolocation.getCurrentPosition(pos => {
-        const payload = {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        
+        // Формируем параметры для Google Script (именно так их ждет твой код)
+        const params = new URLSearchParams({
             name: currentEmployee,
             action: action,
-            lat: pos.coords.latitude,
-            long: pos.coords.longitude
-        };
+            lat: lat,
+            lon: lon,
+            deviceId: "web-client"
+        });
 
-        fetch(WEB_APP_URL, {
-            method: "POST",
-            mode: "no-cors",
-            body: JSON.stringify(payload)
+        // Отправляем GET запрос (твой doGet подхватит это)
+        fetch(`${WEB_APP_URL}?${params.toString()}`, {
+            method: "GET",
+            mode: "no-cors"
         })
         .then(() => {
             status.innerText = "✅ Записано!";
             status.style.color = "green";
-            setTimeout(closeModal, 1500); // Закрыть окно через 1.5 сек
+            setTimeout(closeModal, 1500);
         })
-        .catch(() => {
-            status.innerText = "❌ Ошибка";
+        .catch(err => {
+            status.innerText = "❌ Ошибка сети";
             status.style.color = "red";
         });
+
     }, err => {
         status.innerText = "❌ ВКЛЮЧИТЕ GPS!";
         status.style.color = "red";
