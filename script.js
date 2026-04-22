@@ -1,42 +1,76 @@
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby8YA-AdJj3cEq2so05pur4ZsiFziEE_owOo3HYfztju4nAyKjtz5AQKEVqoMjaMxfIRw/exec"; // Проверь, что /exec на конце
-let currentEmployee = "";
 
-function openModal(name) {
-    currentEmployee = name;
-    document.getElementById('selectedName').innerText = name;
-    document.getElementById('modal').style.display = 'flex';
-    document.getElementById('status').innerText = "";
+// При загрузке проверяем, выбран ли сотрудник
+window.onload = function() {
+    const savedName = localStorage.getItem('staff_name');
+    if (savedName) showInterface(savedName);
+};
+
+function selectMe(name) {
+    localStorage.setItem('staff_name', name);
+    showInterface(name);
 }
 
-function closeModal() {
-    document.getElementById('modal').style.display = 'none';
+function showInterface(name) {
+    document.getElementById('workerName').innerText = name;
+    document.getElementById('passContainer').style.display = 'flex';
 }
 
-function processAction(action) {
-    const status = document.getElementById('status');
-    status.innerText = "⏳ Запись...";
+function resetWorker() {
+    localStorage.removeItem('staff_name');
+    document.getElementById('passContainer').style.display = 'none';
+}
+
+function sendToSheet(action) {
+    const name = localStorage.getItem('staff_name');
+    const btn = event.target;
+    const originalText = btn.innerText;
     
-    navigator.geolocation.getCurrentPosition(pos => {
-        const lat = pos.coords.latitude;
-        const lon = pos.coords.longitude;
-        
-        // Создаем невидимую форму, как это делает Тильда
-        const url = `${WEB_APP_URL}?name=${encodeURIComponent(currentEmployee)}&action=${encodeURIComponent(action)}&lat=${lat}&lon=${lon}&deviceId=web-client`;
+    // Генерация ID устройства как в твоем коде
+    let deviceId = localStorage.getItem('device_fingerprint');
+    if (!deviceId) {
+        deviceId = 'dev-' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('device_fingerprint', deviceId);
+    }
 
-        // Создаем скрытый элемент <img> для отправки GET-запроса в обход всех защит CORS
-        const img = new Image();
-        img.src = url;
-        
-        // Google Script всегда вернет ошибку загрузки картинки (потому что он вернет текст), 
-        // но запрос ДОЙДЕТ до таблицы. Это самый старый и надежный хак.
-        img.onload = img.onerror = function() {
-            status.innerText = "✅ Записано!";
-            status.style.color = "green";
-            setTimeout(closeModal, 1500);
-        };
+    btn.innerText = "ПРОВЕРКА...";
+    btn.disabled = true;
 
-    }, err => {
-        status.innerText = "❌ ВКЛЮЧИТЕ GPS!";
-        status.style.color = "red";
+    navigator.geolocation.getCurrentPosition(function(position) {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        
+        // Формируем строку запроса
+        const query = "?name=" + encodeURIComponent(name) + 
+                      "&action=" + encodeURIComponent(action) + 
+                      "&lat=" + lat + 
+                      "&lon=" + lon +
+                      "&deviceId=" + deviceId;
+
+        // Отправляем POST запрос. 
+        // mode: 'no-cors' критически важен для GitHub Pages
+        fetch(WEB_APP_URL + query, { 
+            method: 'POST',
+            mode: 'no-cors' 
+        })
+        .then(() => {
+            // Так как в no-cors мы не видим текст ответа, 
+            // просто сообщаем об успехе (как в твоем блоке catch на Тильде)
+            alert("✅ Отправлено (проверьте таблицу)");
+            btn.innerText = originalText;
+            btn.disabled = false;
+            // Скрываем окно после успеха
+            setTimeout(resetWorker, 1000);
+        })
+        .catch(err => {
+            alert("❌ Ошибка сети: " + err);
+            btn.innerText = originalText;
+            btn.disabled = false;
+        });
+        
+    }, function(err) {
+        alert("📍 Включите GPS в браузере!");
+        btn.innerText = originalText;
+        btn.disabled = false;
     }, { enableHighAccuracy: true });
 }
