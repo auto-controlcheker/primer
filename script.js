@@ -1,17 +1,45 @@
-body { font-family: sans-serif; background: #ccc; margin: 0; padding: 20px; display: flex; justify-content: center; }
-.main-container { width: 100%; max-width: 400px; text-align: center; }
-.logo-text { color: #f9d423; font-size: 48px; text-shadow: 2px 2px #333; font-weight: black; margin-bottom: 20px; }
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby8YA-AdJj3cEq2so05pur4ZsiFziEE_owOo3HYfztju4nAyKjtz5AQKEVqoMjaMxfIRw/exec";
+let currentEmployee = "";
 
-/* Сетка кнопок */
-.staff-grid { display: flex; flex-direction: column; gap: 10px; }
-.name-btn { background: #d35400; color: white; border: none; padding: 15px; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
+function openModal(name) {
+    currentEmployee = name;
+    document.getElementById('selectedName').innerText = name;
+    document.getElementById('modal').style.display = 'flex';
+    document.getElementById('status').innerText = "";
+}
 
-/* Модальное окно */
-.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; }
-.modal-content { background: white; padding: 30px; border-radius: 20px; width: 80%; max-width: 300px; text-align: center; }
-.action-btn { width: 100%; padding: 20px; margin: 10px 0; border: none; border-radius: 12px; color: white; font-size: 18px; font-weight: bold; cursor: pointer; }
-.btn-in { background: #27ae60; }
-.btn-out { background: #c0392b; }
-.btn-cancel { background: none; border: none; color: #555; text-decoration: underline; margin-top: 15px; cursor: pointer; }
+function closeModal() {
+    document.getElementById('modal').style.display = 'none';
+}
 
-#status { margin-top: 10px; font-weight: bold; }
+function processAction(action) {
+    const status = document.getElementById('status');
+    status.innerText = "⏳ Запись...";
+    
+    navigator.geolocation.getCurrentPosition(pos => {
+        const payload = {
+            name: currentEmployee,
+            action: action,
+            lat: pos.coords.latitude,
+            long: pos.coords.longitude
+        };
+
+        fetch(WEB_APP_URL, {
+            method: "POST",
+            mode: "no-cors",
+            body: JSON.stringify(payload)
+        })
+        .then(() => {
+            status.innerText = "✅ Записано!";
+            status.style.color = "green";
+            setTimeout(closeModal, 1500); // Закрыть окно через 1.5 сек
+        })
+        .catch(() => {
+            status.innerText = "❌ Ошибка";
+            status.style.color = "red";
+        });
+    }, err => {
+        status.innerText = "❌ ВКЛЮЧИТЕ GPS!";
+        status.style.color = "red";
+    }, { enableHighAccuracy: true });
+}
