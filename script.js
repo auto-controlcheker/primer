@@ -1,4 +1,4 @@
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyHt_NjabqD1W_o6BSAYPUAkAwceVihuvTG0YemfhHsBwAHIC-ZKchOfSD__TVWA4zVUg/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby8YA-AdJj3cEq2so05pur4ZsiFziEE_owOo3HYfztju4nAyKjtz5AQKEVqoMjaMxfIRw/exec";
 
 function sendData(action) {
     const name = document.getElementById('nameSelect').value;
