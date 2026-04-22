@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>СКУД Карамель</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -10,23 +10,24 @@
     <div class="main-container">
         <h1 class="logo-text">Карамель</h1>
         
-        <div id="staffButtons" class="staff-grid">
-            <button class="name-btn" onclick="openModal('Вячеслав Валерьевич')">Вячеслав Валерьевич</button>
-            <button class="name-btn" onclick="openModal('Алёна Дмитриевна')">Алёна Дмитриевна</button>
-            <button class="name-btn" onclick="openModal('Галина Александровна')">Галина Александровна</button>
-            <button class="name-btn" onclick="openModal('Мадина Жансериковна')">Мадина Жансериковна</button>
-            <button class="name-btn" onclick="openModal('Марина')">Марина</button>
-            <button class="name-btn" onclick="openModal('Сандугаш')">Сандугаш</button>
-            </div>
+        <div class="staff-grid">
+            <button class="name-btn" onclick="selectMe('Вячеслав Валерьевич')">Вячеслав Валерьевич</button>
+            <button class="name-btn" onclick="selectMe('Алёна Дмитриевна')">Алёна Дмитриевна</button>
+            <button class="name-btn" onclick="selectMe('Галина Александровна')">Галина Александровна</button>
+            <button class="name-btn" onclick="selectMe('Мадина Жансериковна')">Мадина Жансериковна</button>
+            <button class="name-btn" onclick="selectMe('Марина')">Марина</button>
+            <button class="name-btn" onclick="selectMe('Сандугаш')">Сандугаш</button>
+        </div>
 
-        <div id="modal" class="modal-overlay">
-            <div class="modal-content">
-                <h3 id="selectedName">Имя Фамилия</h3>
-                <p>Выберите действие:</p>
-                <button class="action-btn btn-in" onclick="processAction('Пришел')">Я ПРИШЕЛ / ШЛА</button>
-                <button class="action-btn btn-out" onclick="processAction('Ушел')">Я УШЕЛ / ШЛА</button>
-                <button class="btn-cancel" onclick="closeModal()">Это не я</button>
-                <p id="status"></p>
+        <div id="passContainer">
+            <div class="modal-card">
+                <h2 id="workerName"></h2>
+                <p style="color: #666; margin-bottom: 20px; font-size: 16px;">Выберите действие:</p>
+                
+                <button class="modal-btn btn-in" onclick="sendToSheet('Пришел')">Я ПРИШЕЛ / ШЛА</button>
+                <button class="modal-btn btn-out" onclick="sendToSheet('Ушел')">Я УШЕЛ / ШЛА</button>
+                
+                <button class="btn-change" onclick="resetWorker()">Это не я</button>
             </div>
         </div>
     </div>
