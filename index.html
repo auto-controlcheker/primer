@@ -7,30 +7,28 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h2>СКУД Карамель</h2>
+    <div class="main-container">
+        <h1 class="logo-text">Карамель</h1>
         
-        <select id="nameSelect" class="employee-select">
-            <option value="Вячеслав Валерьевич">Вячеслав Валерьевич</option>
-            <option value="Алена Дмитриевна">Алена Дмитриевна</option>
-            <option value="Галина Александровна">Галина Александровна</option>
-            <option value="Мадина Жансериковна">Мадина Жансериковна</option>
-            <option value="Марина">Марина</option>
-            <option value="Сандугаш">Сандугаш</option>
-            <option value="Зайра">Зайра</option>
-            <option value="Виктория">Виктория</option>
-            <option value="Наталья">Наталья</option>
-            <option value="Самал">Самал</option>
-            <option value="Кенжегуль">Кенжегуль</option>
-            <option value="Гульжан">Гульжан</option>
-        </select>
+        <div id="staffButtons" class="staff-grid">
+            <button class="name-btn" onclick="openModal('Вячеслав Валерьевич')">Вячеслав Валерьевич</button>
+            <button class="name-btn" onclick="openModal('Алёна Дмитриевна')">Алёна Дмитриевна</button>
+            <button class="name-btn" onclick="openModal('Галина Александровна')">Галина Александровна</button>
+            <button class="name-btn" onclick="openModal('Мадина Жансериковна')">Мадина Жансериковна</button>
+            <button class="name-btn" onclick="openModal('Марина')">Марина</button>
+            <button class="name-btn" onclick="openModal('Сандугаш')">Сандугаш</button>
+            </div>
 
-        <div class="buttons">
-            <button class="btn btn-in" onclick="sendData('Пришел')">Пришел</button>
-            <button class="btn btn-out" onclick="sendData('Ушел')">Ушел</button>
+        <div id="modal" class="modal-overlay">
+            <div class="modal-content">
+                <h3 id="selectedName">Имя Фамилия</h3>
+                <p>Выберите действие:</p>
+                <button class="action-btn btn-in" onclick="processAction('Пришел')">Я ПРИШЕЛ / ШЛА</button>
+                <button class="action-btn btn-out" onclick="processAction('Ушел')">Я УШЕЛ / ШЛА</button>
+                <button class="btn-cancel" onclick="closeModal()">Это не я</button>
+                <p id="status"></p>
+            </div>
         </div>
-        
-        <p id="status"></p>
     </div>
     <script src="script.js"></script>
 </body>
