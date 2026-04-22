@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>СКУД Карамель</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>СКУД Карамель</h2>
+        <select id="nameSelect">
+            <option value="Вячеслав">Вячеслав</option>
+            <option value="Алёна">Алёна</option>
+            <option value="Сотрудник 3">Сотрудник 3</option>
+        </select>
+        <div class="buttons">
+            <button class="btn btn-in" onclick="sendData('Пришел')">Пришел</button>
+            <button class="btn btn-out" onclick="sendData('Ушел')">Ушел</button>
+        </div>
+        <p id="status"></p>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
