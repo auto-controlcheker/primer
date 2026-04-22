@@ -3,8 +3,9 @@ const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyHt_NjabqD1W_o6BSA
 function sendData(action) {
     const name = document.getElementById('nameSelect').value;
     const status = document.getElementById('status');
-    status.innerText = "Отправка...";
+    status.innerText = "⏳ Отправка...";
 
+    // Проверяем геолокацию
     navigator.geolocation.getCurrentPosition(pos => {
         const payload = {
             name: name,
@@ -13,20 +14,25 @@ function sendData(action) {
             long: pos.coords.longitude
         };
 
+        // Отправляем через fetch
         fetch(WEB_APP_URL, {
             method: "POST",
-            mode: "no-cors",
+            mode: "no-cors", // Это важно для Google Script
+            cache: "no-cache",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
         })
         .then(() => {
-            status.innerText = "✅ Данные отправлены: " + action;
+            status.innerText = "✅ Готово: " + name + " -> " + action;
+            status.style.color = "green";
         })
         .catch(e => {
-            status.innerText = "❌ Ошибка!";
+            status.innerText = "❌ Ошибка сети!";
             console.error(e);
         });
+
     }, err => {
-        status.innerText = "❌ Включи геолокацию!";
-    });
+        status.innerText = "❌ Ошибка: Включи геолокацию в браузере!";
+        status.style.color = "red";
+    }, { enableHighAccuracy: true });
 }
