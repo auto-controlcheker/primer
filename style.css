@@ -1,0 +1,8 @@
+body { font-family: sans-serif; display: flex; justify-content: center; padding: 20px; background: #f4f4f4; }
+.container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 100%; max-width: 300px; text-align: center; }
+select { width: 100%; padding: 10px; margin-bottom: 20px; border-radius: 5px; }
+.buttons { display: flex; gap: 10px; }
+.btn { flex: 1; padding: 15px; border: none; border-radius: 5px; color: white; cursor: pointer; font-weight: bold; }
+.btn-in { background: #28a745; }
+.btn-out { background: #dc3545; }
+#status { margin-top: 15px; font-size: 14px; color: #666; }
