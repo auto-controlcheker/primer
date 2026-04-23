@@ -1,4 +1,4 @@
-const WEB_APP_URL = "ТУТ_ТВОЯ_ССЫЛКА_ИЗ_ГУГЛ_ТАБЛИЦЫ";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby8YA-AdJj3cEq2so05pur4ZsiFziEE_owOo3HYfztju4nAyKjtz5AQKEVqoMjaMxfIRw/exec";
 
 // При загрузке проверяем, не выбран ли уже сотрудник ранее
 window.onload = function() {
