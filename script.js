@@ -1,4 +1,5 @@
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby8YA-AdJj3cEq2so05pur4ZsiFziEE_owOo3HYfztju4nAyKjtz5AQKEVqoMjaMxfIRw/exec";
+const SECRET_KEY = "super_secret_code_777"; // Ключ должен быть таким же, как в Google Script
 
 // При загрузке проверяем, не выбран ли уже сотрудник ранее
 window.onload = function() {
@@ -41,8 +42,8 @@ function sendToSheet(action) {
         const lat = position.coords.latitude;
         const lon = position.coords.longitude;
         
-        // Формируем URL для GET запроса
-        const query = `?name=${encodeURIComponent(name)}&action=${encodeURIComponent(action)}&lat=${lat}&lon=${lon}&deviceId=${deviceId}`;
+        // Формируем URL для GET запроса с добавлением ключа &key=...
+        const query = `?name=${encodeURIComponent(name)}&action=${encodeURIComponent(action)}&lat=${lat}&lon=${lon}&deviceId=${deviceId}&key=${SECRET_KEY}`;
 
         fetch(WEB_APP_URL + query)
         .then(res => res.text())
