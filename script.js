@@ -1,3 +1,28 @@
+const WEB_APP_URL = "ТУТ_ТВОЯ_ССЫЛКА_ИЗ_ГУГЛ_ТАБЛИЦЫ";
+
+// При загрузке проверяем, не выбран ли уже сотрудник ранее
+window.onload = function() {
+    const savedName = localStorage.getItem('staff_name');
+    if (savedName) {
+        showModal(savedName);
+    }
+};
+
+function selectMe(name) {
+    localStorage.setItem('staff_name', name);
+    showModal(name);
+}
+
+function showModal(name) {
+    document.getElementById('workerName').innerText = name;
+    document.getElementById('passContainer').style.display = 'flex';
+}
+
+function resetWorker() {
+    localStorage.removeItem('staff_name');
+    document.getElementById('passContainer').style.display = 'none';
+}
+
 function sendToSheet(action) {
     const name = localStorage.getItem('staff_name');
     const btn = event.target;
@@ -16,32 +41,33 @@ function sendToSheet(action) {
         const lat = position.coords.latitude;
         const lon = position.coords.longitude;
         
-        const url = `${WEB_APP_URL}?name=${encodeURIComponent(name)}&action=${encodeURIComponent(action)}&lat=${lat}&lon=${lon}&deviceId=${deviceId}`;
+        // Формируем URL для GET запроса
+        const query = `?name=${encodeURIComponent(name)}&action=${encodeURIComponent(action)}&lat=${lat}&lon=${lon}&deviceId=${deviceId}`;
 
-        // Убрали no-cors, используем дефолтный GET
-        fetch(url)
+        fetch(WEB_APP_URL + query)
         .then(res => res.text())
         .then(status => {
             if (status.includes("Ошибка")) {
                 alert("❌ " + status);
             } else if (status.includes("Далеко")) {
-                alert("📍 " + status + ". Подойдите ближе!");
+                alert("📍 " + status + "\nНужно быть на торговой точке!");
+            } else if (status === "OK") {
+                alert("✅ Успешно: " + action);
             } else {
-                alert("✅ Записано: " + action);
-                // Можно закрыть модалку тут
-                resetWorker(); 
+                alert("Ответ сервера: " + status);
             }
             btn.innerText = originalText;
             btn.disabled = false;
         })
         .catch(err => {
-            alert("📡 Ошибка сети. Проверьте интернет.");
+            console.error(err);
+            alert("📡 Ошибка связи. Проверьте интернет или ссылку на скрипт.");
             btn.innerText = originalText;
             btn.disabled = false;
         });
         
     }, function(err) {
-        alert("📍 Нужно разрешить доступ к GPS!");
+        alert("📍 Ошибка GPS! Включите геопозицию в настройках телефона и браузера.");
         btn.innerText = originalText;
         btn.disabled = false;
     }, { enableHighAccuracy: true, timeout: 10000 });
