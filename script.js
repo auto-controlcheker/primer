@@ -16,34 +16,33 @@ function sendToSheet(action) {
         const lat = position.coords.latitude;
         const lon = position.coords.longitude;
         
-        // ВАЖНО: используем trim() и убеждаемся, что передаем чистый текст
-        const cleanAction = action.trim();
-        
-        const query = "?name=" + encodeURIComponent(name) + 
-                      "&action=" + encodeURIComponent(cleanAction) + 
-                      "&lat=" + lat + 
-                      "&lon=" + lon +
-                      "&deviceId=" + deviceId;
+        const url = `${WEB_APP_URL}?name=${encodeURIComponent(name)}&action=${encodeURIComponent(action)}&lat=${lat}&lon=${lon}&deviceId=${deviceId}`;
 
-        fetch(WEB_APP_URL + query, { 
-            method: 'POST',
-            mode: 'no-cors' 
-        })
-        .then(() => {
-            alert("✅ Записано: " + cleanAction);
+        // Убрали no-cors, используем дефолтный GET
+        fetch(url)
+        .then(res => res.text())
+        .then(status => {
+            if (status.includes("Ошибка")) {
+                alert("❌ " + status);
+            } else if (status.includes("Далеко")) {
+                alert("📍 " + status + ". Подойдите ближе!");
+            } else {
+                alert("✅ Записано: " + action);
+                // Можно закрыть модалку тут
+                resetWorker(); 
+            }
             btn.innerText = originalText;
             btn.disabled = false;
-            // Убираем авто-закрытие, чтобы ты успел увидеть алерт
         })
         .catch(err => {
-            alert("✅ Отправлено (проверьте таблицу)");
+            alert("📡 Ошибка сети. Проверьте интернет.");
             btn.innerText = originalText;
             btn.disabled = false;
         });
         
     }, function(err) {
-        alert("📍 Включите GPS!");
+        alert("📍 Нужно разрешить доступ к GPS!");
         btn.innerText = originalText;
         btn.disabled = false;
-    }, { enableHighAccuracy: true });
+    }, { enableHighAccuracy: true, timeout: 10000 });
 }
