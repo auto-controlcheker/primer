@@ -46,25 +46,38 @@ function sendToSheet(action, e) {
     navigator.geolocation.getCurrentPosition(function(position) {
         const query = `?name=${encodeURIComponent(name)}&action=${encodeURIComponent(action)}&lat=${position.coords.latitude}&lon=${position.coords.longitude}&deviceId=${deviceId}&key=${SECRET_KEY}`;
 
-        fetch(WEB_APP_URL + query)
-        .then(res => res.text())
+fetch(WEB_APP_URL + query, {
+            method: 'GET', // Явно указываем метод
+            mode: 'cors'   // Включаем режим CORS
+        })
+        .then(res => {
+            if (!res.ok) throw new Error('Network response was not ok');
+            return res.text();
+        })
         .then(status => {
             btn.innerText = originalText;
             btn.disabled = false;
             
-            // Логика алертов
-            if (status === "SUCCESS_OPEN") alert("✅ Смена открыта!");
-            else if (status === "SUCCESS_CLOSE") alert("🚩 Смена закрыта!");
-            else if (status === "ALREADY_OPENED") alert("⚠️ Смена УЖЕ открыта!");
-            else if (status === "ALREADY_CLOSED_TODAY") alert("🚫 Смена УЖЕ была закрыта сегодня.");
-            else if (status === "MUST_OPEN_FIRST") alert("❌ Сперва нужно открыть смену!");
-            else if (status.includes("TOO_FAR")) alert("📍 Вы слишком далеко!");
+            console.log("Ответ от сервера:", status); // Для отладки в консоли
+
+            if (status.includes("SUCCESS_OPEN")) alert("✅ Смена открыта!");
+            else if (status.includes("SUCCESS_CLOSE")) alert("🚩 Смена закрыта!");
+            else if (status.includes("ALREADY_OPENED")) alert("⚠️ Смена УЖЕ открыта!");
+            else if (status.includes("ALREADY_CLOSED_TODAY")) alert("🚫 Смена уже была закрыта сегодня.");
+            else if (status.includes("MUST_OPEN_FIRST")) alert("❌ Сперва нужно открыть смену!");
+            else if (status.includes("TOO_FAR")) {
+                let dist = status.split("|")[1] || "много";
+                alert("📍 Вы слишком далеко (" + dist + "м)!");
+            }
+            else if (status.includes("AUTH_ERROR")) alert("🔒 Ошибка ключа!");
             else alert("📡 Статус: " + status);
         })
         .catch(err => {
+            console.error("Ошибка запроса:", err);
             btn.innerText = originalText;
             btn.disabled = false;
-            alert("❌ Ошибка соединения!");
+            // Если данные в таблицу пришли (ты это видишь), но вылезла ошибка - значит редирект всё еще блокируется
+            alert("❌ Ошибка обработки ответа. Но проверьте таблицу, скорее всего данные ушли!");
         });
         
     }, function(err) {
