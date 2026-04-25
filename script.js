@@ -39,37 +39,43 @@ function sendToSheet(action) {
     btn.disabled = true;
 
     navigator.geolocation.getCurrentPosition(function(position) {
-        const lat = position.coords.latitude;
-        const lon = position.coords.longitude;
-        
-        // Формируем URL для GET запроса с добавлением ключа &key=...
-        const query = `?name=${encodeURIComponent(name)}&action=${encodeURIComponent(action)}&lat=${lat}&lon=${lon}&deviceId=${deviceId}&key=${SECRET_KEY}`;
+        const query = `?name=${encodeURIComponent(name)}&action=${encodeURIComponent(action)}&lat=${position.coords.latitude}&lon=${position.coords.longitude}&deviceId=${deviceId}&key=${SECRET_KEY}`;
 
         fetch(WEB_APP_URL + query)
         .then(res => res.text())
         .then(status => {
-            if (status.includes("Ошибка")) {
-                alert("❌ " + status);
-            } else if (status.includes("Далеко")) {
-                alert("📍 " + status + "\nНужно быть на торговой точке!");
-            } else if (status === "OK") {
-                alert("✅ Успешно: " + action);
-            } else {
-                alert("Ответ сервера: " + status);
-            }
             btn.innerText = originalText;
             btn.disabled = false;
+
+            if (status === "SUCCESS_OPEN") {
+                alert("✅ Смена открыта! Удачного рабочего дня.");
+            } else if (status === "SUCCESS_CLOSE") {
+                alert("🚩 Смена закрыта! Отдыхайте.");
+            } else if (status === "ALREADY_OPENED") {
+                alert("⚠️ Смена УЖЕ открыта! Не нужно нажимать дважды.");
+            } else if (status === "ALREADY_CLOSED_TODAY") {
+                alert("🚫 Смена УЖЕ была закрыта сегодня. Повторное открытие невозможно.");
+            } else if (status === "MUST_OPEN_FIRST") {
+                alert("❌ Ошибка: Сперва нужно открыть смену!");
+            } else if (status.includes("TOO_FAR")) {
+                let dist = status.split("|")[1];
+                alert("📍 Вы слишком далеко (" + dist + "м). Нужно быть на торговой точке!");
+            } else if (status === "AUTH_ERROR") {
+                alert("🔒 Ошибка доступа: неверный ключ.");
+            } else {
+                alert("📡 Ответ системы: " + status);
+            }
         })
         .catch(err => {
-            console.error(err);
-            alert("📡 Ошибка связи. Проверьте интернет или ссылку на скрипт.");
             btn.innerText = originalText;
             btn.disabled = false;
+            alert("❌ Ошибка соединения! Проверьте интернет. Данные НЕ ушли.");
         });
         
     }, function(err) {
-        alert("📍 Ошибка GPS! Включите геопозицию в настройках телефона и браузера.");
         btn.innerText = originalText;
         btn.disabled = false;
+        alert("📍 Включите геопозицию (GPS) в настройках телефона и браузера!");
     }, { enableHighAccuracy: true, timeout: 10000 });
+}
 }
