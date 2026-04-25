@@ -14,8 +14,14 @@ function selectMe(name) {
 }
 
 function showModal(name) {
-    document.getElementById('workerName').innerText = name;
-    document.getElementById('passContainer').style.display = 'flex';
+    const modal = document.getElementById('passContainer');
+    const nameLabel = document.getElementById('workerName');
+    if (modal && nameLabel) {
+        nameLabel.innerText = name;
+        modal.style.display = 'flex';
+    } else {
+        console.error("Ошибка: Элементы модального окна не найдены в HTML");
+    }
 }
 
 function resetWorker() {
@@ -23,10 +29,9 @@ function resetWorker() {
     document.getElementById('passContainer').style.display = 'none';
 }
 
-// Добавили аргумент 'e', чтобы корректно определять кнопку
 function sendToSheet(action, e) {
     const name = localStorage.getItem('staff_name');
-    const btn = e.target; // Используем переданное событие
+    const btn = e.target; 
     const originalText = btn.innerText;
     
     let deviceId = localStorage.getItem('device_fingerprint');
@@ -46,35 +51,25 @@ function sendToSheet(action, e) {
         .then(status => {
             btn.innerText = originalText;
             btn.disabled = false;
-
-            if (status === "SUCCESS_OPEN") {
-                alert("✅ Смена открыта! Удачного рабочего дня.");
-            } else if (status === "SUCCESS_CLOSE") {
-                alert("🚩 Смена закрыта! Отдыхайте.");
-            } else if (status === "ALREADY_OPENED") {
-                alert("⚠️ Смена УЖЕ открыта! Не нужно нажимать дважды.");
-            } else if (status === "ALREADY_CLOSED_TODAY") {
-                alert("🚫 Смена УЖЕ была закрыта сегодня. Повторное открытие невозможно.");
-            } else if (status === "MUST_OPEN_FIRST") {
-                alert("❌ Ошибка: Сперва нужно открыть смену!");
-            } else if (status.includes("TOO_FAR")) {
-                let dist = status.split("|")[1];
-                alert("📍 Вы слишком далеко (" + dist + "м). Нужно быть на торговой точке!");
-            } else if (status === "AUTH_ERROR") {
-                alert("🔒 Ошибка доступа: неверный ключ.");
-            } else {
-                alert("📡 Ответ системы: " + status);
-            }
+            
+            // Логика алертов
+            if (status === "SUCCESS_OPEN") alert("✅ Смена открыта!");
+            else if (status === "SUCCESS_CLOSE") alert("🚩 Смена закрыта!");
+            else if (status === "ALREADY_OPENED") alert("⚠️ Смена УЖЕ открыта!");
+            else if (status === "ALREADY_CLOSED_TODAY") alert("🚫 Смена УЖЕ была закрыта сегодня.");
+            else if (status === "MUST_OPEN_FIRST") alert("❌ Сперва нужно открыть смену!");
+            else if (status.includes("TOO_FAR")) alert("📍 Вы слишком далеко!");
+            else alert("📡 Статус: " + status);
         })
         .catch(err => {
             btn.innerText = originalText;
             btn.disabled = false;
-            alert("❌ Ошибка соединения! Проверьте интернет. Данные НЕ ушли.");
+            alert("❌ Ошибка соединения!");
         });
         
     }, function(err) {
         btn.innerText = originalText;
         btn.disabled = false;
-        alert("📍 Включите геопозицию (GPS) в настройках телефона и браузера!");
+        alert("📍 Включите GPS!");
     }, { enableHighAccuracy: true, timeout: 10000 });
 }
