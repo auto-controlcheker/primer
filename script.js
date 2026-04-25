@@ -1,7 +1,6 @@
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby8YA-AdJj3cEq2so05pur4ZsiFziEE_owOo3HYfztju4nAyKjtz5AQKEVqoMjaMxfIRw/exec";
-const SECRET_KEY = "super_secret_code_777"; // Ключ должен быть таким же, как в Google Script
+const SECRET_KEY = "super_secret_code_777"; 
 
-// При загрузке проверяем, не выбран ли уже сотрудник ранее
 window.onload = function() {
     const savedName = localStorage.getItem('staff_name');
     if (savedName) {
@@ -24,9 +23,10 @@ function resetWorker() {
     document.getElementById('passContainer').style.display = 'none';
 }
 
-function sendToSheet(action) {
+// Добавили аргумент 'e', чтобы корректно определять кнопку
+function sendToSheet(action, e) {
     const name = localStorage.getItem('staff_name');
-    const btn = event.target;
+    const btn = e.target; // Используем переданное событие
     const originalText = btn.innerText;
     
     let deviceId = localStorage.getItem('device_fingerprint');
@@ -77,5 +77,4 @@ function sendToSheet(action) {
         btn.disabled = false;
         alert("📍 Включите геопозицию (GPS) в настройках телефона и браузера!");
     }, { enableHighAccuracy: true, timeout: 10000 });
-}
 }
