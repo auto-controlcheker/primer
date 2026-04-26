@@ -1,45 +1,49 @@
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby5jy3yxVj-gUvGF8tPX3puWvOT1OGWCnWFmk4OJzyXKBuEvWX9pYtG4vMHKOCoQ01kRQ/exec"; 
+const WEB_APP_URL = "ВАШ_URL_СКРИПТА"; 
 const SECRET_KEY = "super_secret_code_777"; 
 
 window.onload = function() {
-    console.log("Страница загружена, запрашиваю имена...");
     loadStaffNames();
 };
 
 function loadStaffNames() {
     const grid = document.querySelector('.staff-grid');
-    if (!grid) {
-        console.error("Критическая ошибка: .staff-grid не найден в HTML!");
-        return;
-    }
+    if (!grid) return;
 
-    grid.innerHTML = "<p style='color:white; text-align:center;'>Загрузка сотрудников...</p>";
+    grid.innerHTML = "<p style='color:white;'>Загрузка...</p>";
 
-    // Глобальная функция для ответа
+    // Создаем временную функцию колбэка
     window.callback = function(response) {
-        console.log("Данные от Google получены:", response);
-        const names = JSON.parse(response);
-        grid.innerHTML = ""; 
+        try {
+            const names = JSON.parse(response);
+            grid.innerHTML = ""; 
 
-        names.forEach(name => {
-            const btn = document.createElement('button');
-            btn.className = 'name-btn';
-            btn.innerText = name;
-            btn.onclick = function() { selectMe(name); };
-            grid.appendChild(btn);
-        });
+            if (names.length === 0) {
+                grid.innerHTML = "<p style='color:white;'>Сотрудники не найдены</p>";
+                return;
+            }
 
-        const savedName = localStorage.getItem('staff_name');
-        if (savedName) showModal(savedName);
+            names.forEach(name => {
+                const btn = document.createElement('button');
+                btn.className = 'name-btn';
+                btn.innerText = name;
+                btn.onclick = () => {
+                    localStorage.setItem('staff_name', name);
+                    showModal(name);
+                };
+                grid.appendChild(btn);
+            });
+
+            // Проверка, если уже залогинен
+            const savedName = localStorage.getItem('staff_name');
+            if (savedName) showModal(savedName);
+            
+        } catch (e) {
+            console.error("Ошибка парсинга:", e);
+            grid.innerHTML = "<p style='color:red;'>Ошибка данных</p>";
+        }
     };
 
-    const script = document.createElement('script');
-    script.src = WEB_APP_URL + "?getStaff=true";
-    script.onerror = function() {
-        console.error("Ошибка загрузки скрипта от Google. Проверьте ссылку или права доступа.");
-        grid.innerHTML = "<p style='color:red;'>Ошибка сети</p>";
-    };
-    document.body.appendChild(script);
+    addScript(WEB_APP_URL + "?getStaff=true");
 }
 
 function sendToSheet(action, e) {
@@ -56,13 +60,11 @@ function sendToSheet(action, e) {
         window.callback = function(status) {
             btn.innerText = originalText;
             btn.disabled = false;
-            alert("Результат: " + status);
+            alert("Статус: " + status);
         };
 
-        const query = "?name=" + encodeURIComponent(name) + "&action=" + encodeURIComponent(action) + "&lat=" + position.coords.latitude + "&lon=" + position.coords.longitude + "&deviceId=" + deviceId + "&key=" + SECRET_KEY;
-        const script = document.createElement('script');
-        script.src = WEB_APP_URL + query;
-        document.body.appendChild(script);
+        const query = `?name=${encodeURIComponent(name)}&action=${encodeURIComponent(action)}&lat=${position.coords.latitude}&lon=${position.coords.longitude}&deviceId=${deviceId}&key=${SECRET_KEY}`;
+        addScript(WEB_APP_URL + query);
     }, function() {
         btn.innerText = originalText;
         btn.disabled = false;
@@ -70,9 +72,12 @@ function sendToSheet(action, e) {
     });
 }
 
-function selectMe(name) {
-    localStorage.setItem('staff_name', name);
-    showModal(name);
+// Вспомогательная функция для добавления скрипта
+function addScript(src) {
+    const script = document.createElement('script');
+    script.src = src;
+    script.onload = () => script.remove(); // Удаляем за собой
+    document.body.appendChild(script);
 }
 
 function showModal(name) {
@@ -82,9 +87,4 @@ function showModal(name) {
         nameLabel.innerText = name;
         modal.style.display = 'flex';
     }
-}
-
-function resetWorker() {
-    localStorage.removeItem('staff_name');
-    document.getElementById('passContainer').style.display = 'none';
 }
