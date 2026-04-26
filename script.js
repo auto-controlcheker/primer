@@ -1,6 +1,51 @@
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby8YA-AdJj3cEq2so05pur4ZsiFziEE_owOo3HYfztju4nAyKjtz5AQKEVqoMjaMxfIRw/exec"; // Проверь URL после развертывания
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby8YA-AdJj3cEq2so05pur4ZsiFziEE_owOo3HYfztju4nAyKjtz5AQKEVqoMjaMxfIRw/exec"; 
 const SECRET_KEY = "super_secret_code_777"; 
 
+// 1. ЗАГРУЗКА ИМЕН ИЗ ТАБЛИЦЫ ПРИ ЗАПУСКЕ
+window.onload = function() {
+    loadStaffNames();
+};
+
+function loadStaffNames() {
+    const grid = document.querySelector('.staff-grid');
+    if (!grid) return;
+
+    grid.innerHTML = "<p style='color:white; grid-column: 1/-1; text-align:center;'>Загрузка сотрудников...</p>";
+
+    // Создаем временную функцию для JSONP ответа
+    window.callback = function(response) {
+        try {
+            const names = JSON.parse(response);
+            grid.innerHTML = ""; // Очищаем текст загрузки
+
+            names.forEach(name => {
+                const btn = document.createElement('button');
+                btn.className = 'name-btn';
+                btn.innerText = name;
+                btn.onclick = () => selectMe(name);
+                grid.appendChild(btn);
+            });
+
+            // После загрузки кнопок проверяем, выбран ли кто-то
+            const savedName = localStorage.getItem('staff_name');
+            if (savedName) showModal(savedName);
+
+        } catch (e) {
+            grid.innerHTML = "<p style='color:red; grid-column: 1/-1;'>Ошибка данных</p>";
+        }
+        cleanupJSONP('jsonp_load');
+    };
+
+    const script = document.createElement('script');
+    script.id = 'jsonp_load';
+    script.src = `${WEB_APP_URL}?getStaff=true`;
+    script.onerror = () => {
+        grid.innerHTML = "<p style='color:red; grid-column: 1/-1;'>Ошибка сети</p>";
+    };
+    document.body.appendChild(script);
+}
+
+// 2. ОТПРАВКА ДАННЫХ (ПРИШЕЛ/УШЕЛ)
 function sendToSheet(action, e) {
     const name = localStorage.getItem('staff_name');
     const btn = e.target;
@@ -19,52 +64,42 @@ function sendToSheet(action, e) {
         const lat = position.coords.latitude;
         const lon = position.coords.longitude;
         
-        // 1. Создаем функцию-обработчик ответа
         window.callback = function(status) {
             btn.innerText = originalText;
             btn.disabled = false;
 
-            // 2. Логика всех твоих уведомлений
             if (status.includes("SUCCESS_OPEN")) {
                 alert("✅ Смена открыта! Удачного рабочего дня.");
             } else if (status.includes("SUCCESS_CLOSE")) {
                 alert("🚩 Смена закрыта! Отдыхайте.");
             } else if (status.includes("ALREADY_OPENED")) {
-                alert("⚠️ Смена УЖЕ открыта! Не нужно нажимать дважды.");
+                alert("⚠️ Смена УЖЕ открыта!");
             } else if (status.includes("ALREADY_CLOSED_TODAY")) {
-                alert("🚫 Смена УЖЕ была закрыта сегодня. Повторное открытие невозможно.");
+                alert("🚫 Смена сегодня уже была закрыта.");
             } else if (status.includes("MUST_OPEN_FIRST")) {
-                alert("❌ Ошибка: Сперва нужно открыть смену!");
+                alert("❌ Сперва нужно открыть смену!");
             } else if (status.includes("TOO_FAR")) {
                 let dist = status.split("|")[1] || "много";
-                alert("📍 Вы слишком далеко (" + dist + "м). Нужно быть на торговой точке!");
+                alert("📍 Вы слишком далеко (" + dist + "м)!");
             } else if (status.includes("AUTH_ERROR")) {
-                alert("🔒 Ошибка доступа: неверный ключ.");
+                alert("🔒 Ошибка ключа.");
             } else {
                 alert("📡 Статус: " + status);
             }
 
-            // Удаляем временный скрипт после работы
-            const oldScript = document.getElementById('jsonp_script');
-            if (oldScript) oldScript.remove();
-            delete window.callback;
+            cleanupJSONP('jsonp_script');
         };
 
-        // 3. Формируем запрос
         const query = `?name=${encodeURIComponent(name)}&action=${encodeURIComponent(action)}&lat=${lat}&lon=${lon}&deviceId=${deviceId}&key=${SECRET_KEY}`;
 
-        // 4. Отправляем через тег <script>
         const script = document.createElement('script');
         script.id = 'jsonp_script';
         script.src = WEB_APP_URL + query;
-        
-        // Обработка ошибки загрузки (например, нет интернета)
         script.onerror = function() {
             btn.innerText = originalText;
             btn.disabled = false;
-            alert("❌ Ошибка связи! Проверьте интернет.");
+            alert("❌ Ошибка связи!");
         };
-
         document.body.appendChild(script);
 
     }, function(err) {
@@ -74,7 +109,13 @@ function sendToSheet(action, e) {
     }, { enableHighAccuracy: true, timeout: 10000 });
 }
 
-// Функции выбора сотрудника (без изменений)
+// ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+function cleanupJSONP(id) {
+    const oldScript = document.getElementById(id);
+    if (oldScript) oldScript.remove();
+    delete window.callback;
+}
+
 function selectMe(name) {
     localStorage.setItem('staff_name', name);
     showModal(name);
@@ -93,8 +134,3 @@ function resetWorker() {
     localStorage.removeItem('staff_name');
     document.getElementById('passContainer').style.display = 'none';
 }
-
-window.onload = function() {
-    const savedName = localStorage.getItem('staff_name');
-    if (savedName) showModal(savedName);
-};
