@@ -1,129 +1,73 @@
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby8YA-AdJj3cEq2so05pur4ZsiFziEE_owOo3HYfztju4nAyKjtz5AQKEVqoMjaMxfIRw/exec"; 
 const SECRET_KEY = "super_secret_code_777"; 
 
-// 1. ЗАГРУЗКА ИМЕН ИЗ ТАБЛИЦЫ ПРИ ЗАПУСКЕ
 window.onload = function() {
+    console.log("Страница загружена, запрашиваю имена...");
     loadStaffNames();
 };
 
 function loadStaffNames() {
     const grid = document.querySelector('.staff-grid');
-    if (!grid) return;
+    if (!grid) {
+        console.error("Критическая ошибка: .staff-grid не найден в HTML!");
+        return;
+    }
 
-    grid.innerHTML = "<p style='color:white; grid-column: 1/-1; text-align:center;'>Загрузка сотрудников...</p>";
+    grid.innerHTML = "<p style='color:white; text-align:center;'>Загрузка сотрудников...</p>";
 
-    // Создаем функцию для ответа специально для загрузки имен
+    // Глобальная функция для ответа
     window.callback = function(response) {
-        try {
-            const names = JSON.parse(response);
-            grid.innerHTML = ""; 
+        console.log("Данные от Google получены:", response);
+        const names = JSON.parse(response);
+        grid.innerHTML = ""; 
 
-            if (names.length === 0) {
-                grid.innerHTML = "<p style='color:white; grid-column: 1/-1;'>Список пуст</p>";
-                return;
-            }
+        names.forEach(name => {
+            const btn = document.createElement('button');
+            btn.className = 'name-btn';
+            btn.innerText = name;
+            btn.onclick = function() { selectMe(name); };
+            grid.appendChild(btn);
+        });
 
-            names.forEach(name => {
-                const btn = document.createElement('button');
-                btn.className = 'name-btn';
-                btn.innerText = name;
-                btn.onclick = function() { selectMe(name); };
-                grid.appendChild(btn);
-            });
-
-            const savedName = localStorage.getItem('staff_name');
-            if (savedName) showModal(savedName);
-
-        } catch (e) {
-            grid.innerHTML = "<p style='color:red; grid-column: 1/-1;'>Ошибка обработки имен</p>";
-        }
-        cleanupJSONP('jsonp_load');
+        const savedName = localStorage.getItem('staff_name');
+        if (savedName) showModal(savedName);
     };
 
     const script = document.createElement('script');
-    script.id = 'jsonp_load';
-    // Используем обычное сложение строк вместо кавычек с баксами
     script.src = WEB_APP_URL + "?getStaff=true";
     script.onerror = function() {
-        grid.innerHTML = "<p style='color:red; grid-column: 1/-1;'>Ошибка сети или Google</p>";
+        console.error("Ошибка загрузки скрипта от Google. Проверьте ссылку или права доступа.");
+        grid.innerHTML = "<p style='color:red;'>Ошибка сети</p>";
     };
     document.body.appendChild(script);
 }
 
-// 2. ОТПРАВКА ДАННЫХ (ПРИШЕЛ/УШЕЛ)
 function sendToSheet(action, e) {
     const name = localStorage.getItem('staff_name');
     const btn = e.target;
     const originalText = btn.innerText;
-    
-    let deviceId = localStorage.getItem('device_fingerprint');
-    if (!deviceId) {
-        deviceId = 'dev-' + Math.random().toString(36).substr(2, 9);
-        localStorage.setItem('device_fingerprint', deviceId);
-    }
+    let deviceId = localStorage.getItem('device_fingerprint') || 'dev-' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('device_fingerprint', deviceId);
 
     btn.innerText = "ПРОВЕРКА...";
     btn.disabled = true;
 
     navigator.geolocation.getCurrentPosition(function(position) {
-        const lat = position.coords.latitude;
-        const lon = position.coords.longitude;
-        
-        // Перезаписываем callback для обработки результата отправки
         window.callback = function(status) {
             btn.innerText = originalText;
             btn.disabled = false;
-
-            if (status.includes("SUCCESS_OPEN")) {
-                alert("✅ Смена открыта! Удачного рабочего дня.");
-            } else if (status.includes("SUCCESS_CLOSE")) {
-                alert("🚩 Смена закрыта! Отдыхайте.");
-            } else if (status.includes("ALREADY_OPENED")) {
-                alert("⚠️ Смена УЖЕ открыта!");
-            } else if (status.includes("ALREADY_CLOSED_TODAY")) {
-                alert("🚫 Смена сегодня уже была закрыта.");
-            } else if (status.includes("MUST_OPEN_FIRST")) {
-                alert("❌ Сперва нужно открыть смену!");
-            } else if (status.includes("TOO_FAR")) {
-                let dist = status.split("|")[1] || "много";
-                alert("📍 Вы слишком далеко (" + dist + "м)!");
-            } else if (status.includes("AUTH_ERROR")) {
-                alert("🔒 Ошибка ключа.");
-            } else {
-                alert("📡 Статус: " + status);
-            }
-
-            cleanupJSONP('jsonp_script');
+            alert("Результат: " + status);
         };
 
-        const query = "?name=" + encodeURIComponent(name) + 
-                      "&action=" + encodeURIComponent(action) + 
-                      "&lat=" + lat + 
-                      "&lon=" + lon + 
-                      "&deviceId=" + deviceId + 
-                      "&key=" + SECRET_KEY;
-
+        const query = "?name=" + encodeURIComponent(name) + "&action=" + encodeURIComponent(action) + "&lat=" + position.coords.latitude + "&lon=" + position.coords.longitude + "&deviceId=" + deviceId + "&key=" + SECRET_KEY;
         const script = document.createElement('script');
-        script.id = 'jsonp_script';
         script.src = WEB_APP_URL + query;
-        script.onerror = function() {
-            btn.innerText = originalText;
-            btn.disabled = false;
-            alert("❌ Ошибка связи!");
-        };
         document.body.appendChild(script);
-
-    }, function(err) {
+    }, function() {
         btn.innerText = originalText;
         btn.disabled = false;
-        alert("📍 Включите геопозицию (GPS)!");
-    }, { enableHighAccuracy: true, timeout: 10000 });
-}
-
-function cleanupJSONP(id) {
-    const oldScript = document.getElementById(id);
-    if (oldScript) oldScript.remove();
-    // Не удаляем window.callback полностью, чтобы не ломать параллельные процессы
+        alert("Включите GPS");
+    });
 }
 
 function selectMe(name) {
