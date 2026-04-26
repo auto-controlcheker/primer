@@ -12,35 +12,40 @@ function loadStaffNames() {
 
     grid.innerHTML = "<p style='color:white; grid-column: 1/-1; text-align:center;'>Загрузка сотрудников...</p>";
 
-    // Создаем временную функцию для JSONP ответа
+    // Создаем функцию для ответа специально для загрузки имен
     window.callback = function(response) {
         try {
             const names = JSON.parse(response);
-            grid.innerHTML = ""; // Очищаем текст загрузки
+            grid.innerHTML = ""; 
+
+            if (names.length === 0) {
+                grid.innerHTML = "<p style='color:white; grid-column: 1/-1;'>Список пуст</p>";
+                return;
+            }
 
             names.forEach(name => {
                 const btn = document.createElement('button');
                 btn.className = 'name-btn';
                 btn.innerText = name;
-                btn.onclick = () => selectMe(name);
+                btn.onclick = function() { selectMe(name); };
                 grid.appendChild(btn);
             });
 
-            // После загрузки кнопок проверяем, выбран ли кто-то
             const savedName = localStorage.getItem('staff_name');
             if (savedName) showModal(savedName);
 
         } catch (e) {
-            grid.innerHTML = "<p style='color:red; grid-column: 1/-1;'>Ошибка данных</p>";
+            grid.innerHTML = "<p style='color:red; grid-column: 1/-1;'>Ошибка обработки имен</p>";
         }
         cleanupJSONP('jsonp_load');
     };
 
     const script = document.createElement('script');
     script.id = 'jsonp_load';
-    script.src = `${WEB_APP_URL}?getStaff=true`;
-    script.onerror = () => {
-        grid.innerHTML = "<p style='color:red; grid-column: 1/-1;'>Ошибка сети</p>";
+    // Используем обычное сложение строк вместо кавычек с баксами
+    script.src = WEB_APP_URL + "?getStaff=true";
+    script.onerror = function() {
+        grid.innerHTML = "<p style='color:red; grid-column: 1/-1;'>Ошибка сети или Google</p>";
     };
     document.body.appendChild(script);
 }
@@ -64,6 +69,7 @@ function sendToSheet(action, e) {
         const lat = position.coords.latitude;
         const lon = position.coords.longitude;
         
+        // Перезаписываем callback для обработки результата отправки
         window.callback = function(status) {
             btn.innerText = originalText;
             btn.disabled = false;
@@ -90,7 +96,12 @@ function sendToSheet(action, e) {
             cleanupJSONP('jsonp_script');
         };
 
-        const query = `?name=${encodeURIComponent(name)}&action=${encodeURIComponent(action)}&lat=${lat}&lon=${lon}&deviceId=${deviceId}&key=${SECRET_KEY}`;
+        const query = "?name=" + encodeURIComponent(name) + 
+                      "&action=" + encodeURIComponent(action) + 
+                      "&lat=" + lat + 
+                      "&lon=" + lon + 
+                      "&deviceId=" + deviceId + 
+                      "&key=" + SECRET_KEY;
 
         const script = document.createElement('script');
         script.id = 'jsonp_script';
@@ -109,11 +120,10 @@ function sendToSheet(action, e) {
     }, { enableHighAccuracy: true, timeout: 10000 });
 }
 
-// ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
 function cleanupJSONP(id) {
     const oldScript = document.getElementById(id);
     if (oldScript) oldScript.remove();
-    delete window.callback;
+    // Не удаляем window.callback полностью, чтобы не ломать параллельные процессы
 }
 
 function selectMe(name) {
