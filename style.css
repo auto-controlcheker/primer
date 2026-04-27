@@ -161,7 +161,9 @@ body {
     font-weight: bold;
     font-size: 16px;
     cursor: pointer;
-    
+    white-space: nowrap; /* Запрещает перенос текста на новую строку */
+    padding: 0 10px;    /* Добавляет внутренние отступы по бокам */
+
     /* Центрирование текста внутри */
     display: flex;
     align-items: center;
