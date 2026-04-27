@@ -142,16 +142,31 @@ body {
     to { transform: translateY(0); opacity: 1; }
 }
 
-.modal-buttons { display: flex; gap: 15px; margin: 25px 0; }
+.modal-buttons { 
+    display: flex; 
+    gap: 15px; 
+    margin: 25px 0; 
+    justify-content: center; /* Центрируем кнопки */
+}
 
 .action-btn {
-    flex: 1;
-    padding: 15px;
+    flex: 1; /* Это заставляет кнопки занимать равное пространство */
+    min-width: 120px; /* Минимальная ширина, чтобы кнопки не были слишком узкими */
+    height: 50px; /* Фиксированная высота для идеальной симметрии */
     border: none;
     border-radius: 10px;
     color: white;
     font-weight: bold;
+    font-size: 16px;
     cursor: pointer;
+    transition: opacity 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+}
+.action-btn:active {
+    opacity: 0.8;
 }
 
 .action-btn.success { background-color: #27ae60; }
