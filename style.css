@@ -1,30 +1,159 @@
-body { font-family: sans-serif; background: #ccc; margin: 0; padding: 20px; display: flex; justify-content: center; }
-.main-container { width: 100%; max-width: 400px; text-align: center; }
-.logo-text { color: #f9d423; font-size: 48px; text-shadow: 2px 2px #333; font-weight: 900; margin-bottom: 20px; }
+:root {
+    --primary-orange: #FF7A00;
+    --dark-orange: #E66E00;
+    --bg-color: #ffffff;
+    --text-main: #333;
+}
 
-.staff-grid { display: flex; flex-direction: column; gap: 10px; }
-.name-btn { background: #d35400; color: white; border: none; padding: 15px; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
+body {
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-color);
+    margin: 0;
+    display: flex;
+    justify-content: center;
+}
 
-/* Твое окно из Тильды */
-#passContainer {
-    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(244, 244, 244, 0.95); z-index: 9999; justify-content: center; align-items: center; 
-    flex-direction: column; box-sizing: border-box;
+.container {
+    width: 100%;
+    max-width: 1000px;
+    padding: 40px 20px;
+    text-align: center;
 }
-.modal-card {
-    background: white; padding: 30px 20px; border-radius: 20px; 
-    box-shadow: 0 15px 35px rgba(0,0,0,0.15); text-align: center; 
-    width: 90%; max-width: 380px; box-sizing: border-box;
+
+/* Логотип */
+.logo-text {
+    font-size: 64px;
+    font-weight: 900;
+    color: #FFEB3B;
+    text-shadow: 3px 3px 0px #000, -3px -3px 0px #000, 3px -3px 0px #000, -3px 3px 0px #000;
+    font-style: italic;
+    margin-bottom: 20px;
+    text-transform: uppercase;
 }
-.modal-btn {
-    width: 100%; padding: 18px 10px; margin: 10px 0; 
-    font-size: 18px; font-weight: bold; border: none; border-radius: 12px; 
-    cursor: pointer; transition: 0.2s; box-sizing: border-box;
+
+/* Инструкция */
+.instruction {
+    text-align: left;
+    display: inline-block;
+    max-width: 700px;
+    margin-bottom: 40px;
+    line-height: 1.6;
+    color: #444;
 }
-.btn-in { background: #2ecc71; color: white; }
-.btn-out { background: #e74c3c; color: white; }
-.btn-change { 
-    background: none; color: #777; font-size: 14px; 
-    text-decoration: underline; margin-top: 15px; border: none; cursor: pointer;
+
+.instruction ol { padding-left: 20px; }
+.warning, .danger { margin-top: 10px; font-size: 14px; }
+
+/* Сетка кнопок */
+.staff-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 колонки для ПК */
+    gap: 15px;
+    justify-content: center;
 }
-#workerName { color: #333; margin: 0 0 5px 0; font-size: 22px; }
+
+/* Мобильная версия: кнопки по центру в один столбец */
+@media (max-width: 768px) {
+    .staff-grid {
+        grid-template-columns: 1fr;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+    .logo-text { font-size: 48px; }
+}
+
+/* Кнопки сотрудников */
+.name-btn {
+    background: linear-gradient(180deg, #FF9533 0%, #FF7A00 100%);
+    color: white;
+    border: none;
+    padding: 20px 10px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    height: 100%;
+}
+
+.name-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.name-btn:active { transform: translateY(0); }
+
+/* ПРЕЛОАДЕР (Скелетон) */
+.loader-wrapper {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: inherit;
+    gap: inherit;
+    width: 100%;
+}
+
+.skeleton-btn {
+    height: 60px;
+    background: #f0f0f0;
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+}
+
+.skeleton-btn::after {
+    content: "";
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    background: linear-gradient(90deg, #f0f0f0 25%, #f8f8f8 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Модальное окно */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-buttons { display: flex; gap: 15px; margin: 25px 0; }
+
+.action-btn {
+    flex: 1;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.action-btn.success { background-color: #27ae60; }
+.action-btn.danger { background-color: #eb4d4b; }
+.close-btn { background: none; border: 1px solid #ccc; padding: 8px 20px; border-radius: 5px; cursor: pointer; }
