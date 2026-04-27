@@ -147,13 +147,14 @@ body {
     gap: 15px; 
     margin: 25px 0; 
     justify-content: center; 
-    align-items: stretch; /* Растягивает кнопки до одной высоты, если они во flex-ряду */
+    /* Добавь это, чтобы выровнять их по одной оси */
+    align-items: center; 
 }
 
 .action-btn {
-    flex: 1; /* Дает кнопкам равную ширину */
-    height: 54px; /* Фиксируем высоту для идеального выравнивания */
-    
+    flex: 1;
+    /* Убедись, что высота одинаковая (у тебя уже стоит 54px) */
+    height: 54px; 
     border: none;
     border-radius: 10px;
     color: white;
@@ -161,15 +162,15 @@ body {
     font-size: 16px;
     cursor: pointer;
     
-    /* Эти 3 строки центрируют текст внутри кнопки строго посередине */
+    /* Центрирование текста внутри */
     display: flex;
     align-items: center;
     justify-content: center;
     
     text-transform: uppercase;
-    transition: opacity 0.2s;
+    /* Убери возможные внешние отступы, которые могут ломать сетку */
+    margin: 0; 
 }
-
 .action-btn:active {
     opacity: 0.8;
 }
