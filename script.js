@@ -1,4 +1,4 @@
-const WEB_APP_URL = "ВАШ_URL_ТУТ"; 
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby5jy3yxVj-gUvGF8tPX3puWvOT1OGWCnWFmk4OJzyXKBuEvWX9pYtG4vMHKOCoQ01kRQ/exec"; 
 const SECRET_KEY = "super_secret_code_777"; 
 
 window.callback = function(status) {
