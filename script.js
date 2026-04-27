@@ -9,6 +9,16 @@ window.callback = function(status) {
     handleActionStatus(status);
 };
 
+// Исправленный блок загрузки: проверяет сохраненное имя
+window.onload = function() {
+    loadStaffNames(); 
+    
+    const savedName = localStorage.getItem('staff_name');
+    if (savedName) {
+        openModal(savedName);
+    }
+};
+
 function loadStaffNames() {
     addScript(WEB_APP_URL + "?getStaff=true");
 }
@@ -17,22 +27,29 @@ function renderStaff(names) {
     const grid = document.getElementById('staffGrid');
     if (!grid) return;
     
-    grid.style.opacity = '0'; // Плавное появление
+    grid.style.opacity = '0';
     setTimeout(() => {
         grid.innerHTML = "";
         names.forEach(name => {
             const btn = document.createElement('button');
             btn.className = 'name-btn';
             btn.innerText = name;
-            btn.onclick = () => {
-                localStorage.setItem('staff_name', name);
-                document.getElementById('workerName').innerText = name;
-                document.getElementById('passContainer').style.display = 'flex';
-            };
+            btn.onclick = () => openModal(name); // Используем функцию открытия
             grid.appendChild(btn);
         });
         grid.style.opacity = '1';
     }, 300);
+}
+
+// Новая функция открытия модалки с сохранением в память
+function openModal(name) {
+    const modal = document.getElementById('passContainer');
+    const nameLabel = document.getElementById('workerName');
+    if (modal && nameLabel) {
+        localStorage.setItem('staff_name', name); // Запоминаем выбор
+        nameLabel.innerText = name;
+        modal.style.display = 'flex';
+    }
 }
 
 function handleActionStatus(status) {
@@ -52,7 +69,9 @@ function handleActionStatus(status) {
     if (status.includes("TOO_FAR")) msg = "📍 Вы слишком далеко!";
     
     alert(msg);
-    if (status.includes("SUCCESS")) closeModal();
+    if (status.includes("SUCCESS")) {
+        closeModal();
+    }
 }
 
 function sendToSheet(action, event) {
@@ -74,8 +93,10 @@ function sendToSheet(action, event) {
     });
 }
 
+// Очищаем память при закрытии или после успешной отправки
 function closeModal() {
     document.getElementById('passContainer').style.display = 'none';
+    localStorage.removeItem('staff_name'); 
 }
 
 function addScript(src) {
@@ -86,5 +107,3 @@ function addScript(src) {
     s.src = src + "&t=" + Date.now();
     document.body.appendChild(s);
 }
-
-window.onload = loadStaffNames;
