@@ -158,8 +158,8 @@ body {
     border: none;
     border-radius: 10px;
     color: white;
-    font-weight: bold;
-    font-size: 16px;
+    font-weight: 500;
+    font-size: 13px;
     cursor: pointer;
     white-space: nowrap; /* Запрещает перенос текста на новую строку */
     padding: 0 10px;    /* Добавляет внутренние отступы по бокам */
