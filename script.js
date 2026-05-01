@@ -29,7 +29,7 @@ window.onload = function(){
 };
 
 function _0xl(){
-    _0xa(_0xW + "?getStaff=true");
+    _0xa(_0xW + "?getStaff=true&callback=callback");
 }
 
 function _0xr(_0xn){
@@ -99,7 +99,7 @@ window.sendToSheet = function(_0xa,_0xb){
 
         localStorage.setItem('device_fingerprint', _0xf);
 
-        const _0xq = `?name=${encodeURIComponent(_0xn)}&action=${encodeURIComponent(_0xa)}&lat=${_0xp.coords.latitude}&lon=${_0xp.coords.longitude}&deviceId=${_0xf}&key=${_0xK}`;
+        const _0xq = `?name=${encodeURIComponent(_0xn)}&action=${encodeURIComponent(_0xa)}&lat=${_0xp.coords.latitude}&lon=${_0xp.coords.longitude}&deviceId=${_0xf}&key=${_0xK}&callback=callback`;
 
         _0xa2(_0xW + _0xq);
     }, function(){
