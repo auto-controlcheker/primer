@@ -84,7 +84,8 @@ function sendToSheet(action, event) {
     navigator.geolocation.getCurrentPosition(position => {
         let deviceId = localStorage.getItem('device_fingerprint') || 'dev-' + Math.random().toString(36).substr(2, 9);
         localStorage.setItem('device_fingerprint', deviceId);
-        const query = ?name=${encodeURIComponent(name)}&action=${encodeURIComponent(action)}&lat=${position.coords.latitude}&lon=${position.coords.longitude}&deviceId=${deviceId}&key=${SECRET_KEY};
+        // ИСПРАВЛЕНО:
+const query = `?name=${encodeURIComponent(name)}&action=${encodeURIComponent(action)}&lat=${position.coords.latitude}&lon=${position.coords.longitude}&deviceId=${deviceId}&key=${SECRET_KEY}`;
         addScript(WEB_APP_URL + query);
     }, () => {
         btn.disabled = false;
