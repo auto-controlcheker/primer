@@ -3,7 +3,7 @@
 const _0x = (s)=>atob(s);
 
 // base64 скрытие
-const _0xW = _0x("https://script.google.com/macros/s/AKfycby5jy3yxVj-gUvGF8tPX3puWvOT1OGWCnWFmk4OJzyXKBuEvWX9pYtG4vMHKOCoQ01kRQ/exec");
+const _0xW = _0x("aHR0cHM6Ly9zY3JpcHQuZ29vZ2xlLmNvbS9tYWNyb3Mvcy9BS2Z5Y2J5NWp5M3l4VmotZ1V2R0Y4dFBYM3B1V3ZPVDFPR1dDbldGbWs0T0p6eVhLQnVFdldYWDlwWXRHNHZNSEtPQ29RMDFrUlEvZXhlYw==");
 const _0xK = _0x("c3VwZXJfc2VjcmV0X2NvZGVfNzc3");
 
 // анти-простое открытие devtools (не панацея)
