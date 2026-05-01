@@ -13,8 +13,8 @@ document.addEventListener('keydown', e => {
 });
 
 window.callback = function(_0xs){
-    if (_0xs.startsWith("[")) {
-        _0xr(JSON.parse(_0xs));
+    if (Array.isArray(_0xs)) {
+        _0xr(_0xs);
         return;
     }
     _0xh(_0xs);
