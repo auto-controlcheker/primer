@@ -87,7 +87,7 @@ async function generateSignature(message) {
 }
 
 async function sendToSheet(action, event) {
-    const name = localStorage.getItem('staff_name');
+    const name = (localStorage.getItem('staff_name') || "").trim();
     const btn = event.target;
 
     btn.dataset.originalText = btn.innerText;
@@ -96,21 +96,27 @@ async function sendToSheet(action, event) {
 
     navigator.geolocation.getCurrentPosition(async position => {
 
-        let deviceId = localStorage.getItem('device_fingerprint') 
-            || 'dev-' + Math.random().toString(36).substr(2, 9);
-
-        localStorage.setItem('device_fingerprint', deviceId);
+        let deviceId = localStorage.getItem('device_fingerprint');
+        if (!deviceId) {
+            deviceId = 'dev-' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('device_fingerprint', deviceId);
+        }
 
         const ts = Date.now().toString();
-        const payload = [
-  name?.trim(),
-  action?.trim(),
-  ts,
-  deviceId
-].join("|");
+
+        // 🔥 ВАЖНО: тот же формат что на сервере
+        const payload = [name, action, ts, deviceId].join("|");
+
         const sig = await generateSignature(payload);
 
-        const query = `?name=${encodeURIComponent(name)}&action=${encodeURIComponent(action)}&lat=${position.coords.latitude}&lon=${position.coords.longitude}&deviceId=${deviceId}&ts=${ts}&sig=${encodeURIComponent(sig)}`;
+        const query =
+            `?name=${encodeURIComponent(name)}` +
+            `&action=${encodeURIComponent(action)}` +
+            `&lat=${position.coords.latitude}` +
+            `&lon=${position.coords.longitude}` +
+            `&deviceId=${deviceId}` +
+            `&ts=${ts}` +
+            `&sig=${encodeURIComponent(sig)}`;
 
         addScript(WEB_APP_URL + query);
 
