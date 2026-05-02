@@ -1,9 +1,16 @@
 (function(){
-    const _0x5511 = "\x68\x74\x74\x70\x73\x3a\x2f\x2f\x73\x63\x72\x69\x70\x74\x2e\x67\x6f\x6f\x67\x6c\x65\x2e\x63\x6f\x6d\x2f\x6d\x61\x63\x72\x6f\x73\x2f\x73\x2f\x41\x4b\x66\x79\x63\x62\x79\x35\x6a\x79\x33\x79\x78\x56\x6a\x2d\x67\x55\x76\x47\x46\x38\x74\x50\x58\x33\x70\x75\x57\x76\x4f\x54\x31\x4f\x47\x57\x43\x6e\x57\x46\x6d\x6b\x34\x4f\x4a\x7a\x79\x58\x4b\x42\x75\x45\x76\x57\x58\x39\x70\x59\x74\x47\x34\x76\x4d\x48\x4b\x4f\x43\x71\x30\x31\x6b\x52\x51\x2f\x65\x78\x65\x63";
-    const _0x229c = "\x73\x75\x70\x65\x72\x5f\x73\x65\x63\x72\x65\x74\x5f\x63\x6f\x64\x65\x5f\x37\x37\x37";
+    // Ссылка зашифрована в числовой массив (коды символов)
+    // Это не дает найти "google" или "https" через поиск по файлу
+    const _0xData = [104,116,116,112,115,58,47,47,115,99,114,105,112,116,46,103,111,111,103,108,101,46,99,111,109,47,109,97,99,114,111,115,47,115,47,65,75,102,121,99,98,121,53,106,121,51,121,120,86,106,45,103,85,118,71,70,56,116,80,88,51,112,117,87,118,79,84,49,79,71,87,67,110,87,70,109,107,52,79,74,122,121,88,75,66,117,69,118,87,88,57,112,89,116,71,52,118,77,72,75,79,67,113,48,49,107,82,81,47,101,120,101,99];
+    
+    // Функция-сборщик: превращает числа обратно в буквы
+    const _0xGetURL = () => _0xData.map(c => String.fromCharCode(c)).join('');
+    
+    const _0x5511 = _0xGetURL();
+    const _0x229c = "super_secret_code_777"; 
 
     window.callback = function(s) {
-        if (s.startsWith("[")) {
+        if (typeof s === 'string' && s.startsWith("[")) {
             _0x3a2b(JSON.parse(s));
             return;
         }
@@ -34,8 +41,7 @@
     }
 
     function _0x99c1(n) {
-        const m = document.getElementById('passContainer');
-        const l = document.getElementById('workerName');
+        const m = document.getElementById('passContainer'), l = document.getElementById('workerName');
         if (m && l) {
             localStorage.setItem('staff_name', n);
             l.innerText = n;
@@ -49,7 +55,6 @@
             b.disabled = false; 
             b.innerText = b.dataset.o || b.innerText; 
         });
-
         const a = {
             "SUCCESS_OPEN": " Смена открыта! Удачного рабочего дня.",
             "SUCCESS_CLOSE": " Смена закрыта! Отдыхайте.",
@@ -58,20 +63,17 @@
             "MUST_OPEN_FIRST": " Сперва нужно открыть смену!",
             "AUTH_ERROR": " Ошибка доступа."
         };
-
         let msg = a[s] || " Статус: " + s;
-        if (s.includes("TOO_FAR")) msg = " Вы слишком далеко!";
+        if (typeof s === 'string' && s.includes("TOO_FAR")) msg = " Вы слишком далеко!";
         alert(msg);
-        if (s.includes("SUCCESS")) _0x88c2();
+        if (typeof s === 'string' && s.includes("SUCCESS")) _0x88c2();
     }
 
     window.sendToSheet = function(ac, e) {
-        const n = localStorage.getItem('staff_name');
-        const b = e.target;
+        const n = localStorage.getItem('staff_name'), b = e.target;
         b.dataset.o = b.innerText;
         b.innerText = "...";
         b.disabled = true;
-
         navigator.geolocation.getCurrentPosition(p => {
             let d = localStorage.getItem('df') || 'dev-' + Math.random().toString(36).substr(2, 9);
             localStorage.setItem('df', d);
@@ -90,8 +92,8 @@
     }
 
     function _0x44d1(src) {
-        const old = document.getElementById('api-req');
-        if (old) old.remove();
+        const o = document.getElementById('api-req');
+        if (o) o.remove();
         const s = document.createElement('script');
         s.id = 'api-req';
         s.src = src + "&t=" + Date.now();
