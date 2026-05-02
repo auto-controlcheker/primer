@@ -45,14 +45,7 @@ async function sendToSheet(action, event) {
 
         const signature = await generateSignature(payload, SECRET);
 
-        const query = `?name=${encodeURIComponent(name)}
-        &action=${encodeURIComponent(action)}
-        &lat=${position.coords.latitude}
-        &lon=${position.coords.longitude}
-        &deviceId=${deviceId}
-        &ts=${timestamp}
-        &sig=${encodeURIComponent(signature)}`;
-
+        const query = `?name=${encodeURIComponent(name)}&action=${encodeURIComponent(action)}&lat=${position.coords.latitude}&lon=${position.coords.longitude}&deviceId=${deviceId}&ts=${timestamp}&sig=${encodeURIComponent(signature)}`;
         addScript(WEB_APP_URL + query);
 
     }, () => {
