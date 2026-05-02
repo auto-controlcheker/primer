@@ -102,7 +102,12 @@ async function sendToSheet(action, event) {
         localStorage.setItem('device_fingerprint', deviceId);
 
         const ts = Date.now().toString();
-        const payload = name + action + ts + deviceId;
+        const payload = [
+  name?.trim(),
+  action?.trim(),
+  ts,
+  deviceId
+].join("|");
         const sig = await generateSignature(payload);
 
         const query = `?name=${encodeURIComponent(name)}&action=${encodeURIComponent(action)}&lat=${position.coords.latitude}&lon=${position.coords.longitude}&deviceId=${deviceId}&ts=${ts}&sig=${encodeURIComponent(sig)}`;
