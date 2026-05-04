@@ -115,7 +115,7 @@ async function sendToSheet(action, event) {
         try {
             const res = await fetch(url);
             const text = await res.text();
-            handleActionStatus(text);
+            handleActionStatus(JSON.parse(text));
         } catch (e) {
             alert("❌ Ошибка сети");
         }
